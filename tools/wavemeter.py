@@ -13,7 +13,7 @@ from shapely.geometry import Point, Polygon
 # Configurations
 points_distance = 25 #m
 max_distance = 12.5 #km
-step_size_profile = 0.025 #Km
+step_size_profile = 0.0125 #Km
 max_iterations = max_distance/step_size_profile
 max_L = 0.1 #Km
 max_H = 0.010 #Km
@@ -129,8 +129,8 @@ def getPosNegIdx(L):
 """
 
 if __name__ == "__main__":
-    if len(sys.argv) != 4:
-        print("Usage: python " + str(sys.argv[0]) + " shapefile.shp dtmFile.nc regridded_WW3_file.nc")
+    if len(sys.argv) != 5:
+        print("Usage: python " + str(sys.argv[0]) + " shapefile.shp dtmFile.nc regridded_WW3_file.nc output_directory")
         sys.exit(-1)
 
     lines = gpd.read_file(sys.argv[1])
