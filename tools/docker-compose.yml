@@ -1,0 +1,16 @@
+version: "3.3"
+
+services:
+  postgis:
+    image: mdillon/postgis
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: dtm
+      POSTGRES_PASSWORD: Dtm2022
+      POSTGRES_DB: dtm
+    ports:
+      - 5432:5432
+    volumes:
+      - pgdata:/Users/ciro/Desktop/dev/sam/data
+volumes:
+  pgdata:
