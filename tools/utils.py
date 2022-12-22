@@ -21,7 +21,7 @@ def getIndexMaxMinLatLon(lats, lons, dtmFile):
     return latli, latui, lonli, lonui
 
 
-def saveNetCDF(filename, lat, lon, time, hs, lm, dir, wspd10i, slp, value):
+def saveNetCDF(filename, lat, lon, time, hs, lm, dir, t0m1, wspd10i, slp, value):
     ncdstfile = Dataset(filename, "w", format="NETCDF4")
     ncdstfile.createDimension("time", size=1)
     ncdstfile.createDimension("latitude", size=len(lat))
@@ -47,7 +47,7 @@ def saveNetCDF(filename, lat, lon, time, hs, lm, dir, wspd10i, slp, value):
     latVar.long_name = "latitude"
     latVar.units = "degrees_north"
 
-    if hs is not None and lm is not None and dir is not None:
+    if hs is not None and lm is not None and dir is not None and t0m1 is not None:
         hsVar = ncdstfile.createVariable("hs", "f4", ("time", "latitude", "longitude"), fill_value=value)
         hsVar.description = "hs"
         hsVar.long_name = "significant height of wind and swell waves"
@@ -63,13 +63,19 @@ def saveNetCDF(filename, lat, lon, time, hs, lm, dir, wspd10i, slp, value):
         dirVar.long_name = "wave mean direction"
         dirVar.units = "degree"
 
+        t0m1Var = ncdstfile.createVariable("t0m1", "f4", ("time", "latitude", "longitude"), fill_value=value)
+        t0m1Var.description = "t0m1"
+        t0m1Var.long_name = "mean period T0m1"
+        t0m1Var.units = "s"
+
         timeVar[:] = time
         lonVar[:] = lon
         latVar[:] = lat
         hsVar[::] = hs
         lmVar[::] = lm
         dirVar[::] = dir
-        
+        t0m1Var[::] = t0m1
+
     elif wspd10i is not None and slp is not None:
         wspd10iVar = ncdstfile.createVariable("WSPD10", "f4", ("time", "latitude", "longitude"), fill_value=value)
         wspd10iVar.description = "WSPD10"

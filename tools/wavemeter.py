@@ -136,6 +136,7 @@ if __name__ == "__main__":
     lines = gpd.read_file(sys.argv[1])
     dtm = Dataset(sys.argv[2])
     ww3 = Dataset(sys.argv[3])
+    outputDir = sys.argv[4]
 
     min_lat, max_lat, min_lon, max_lon = np.min(dtm["latitude"][:]), np.max(dtm["latitude"][:]), np.min(dtm["longitude"][:]), np.max(dtm["longitude"][:])
     area = Polygon([[min_lon, min_lat], [min_lon, max_lat], [max_lon, max_lat], [max_lon, min_lat]])
@@ -216,6 +217,6 @@ if __name__ == "__main__":
                             id += 1
 
     wavemeter_collection = FeatureCollection(wavemeters)
-    with open('wavemeter.geojson', 'w') as f:
+    with open(outputDir + '/wavemeter.geojson', 'w') as f:
        dump(wavemeter_collection, f)
 

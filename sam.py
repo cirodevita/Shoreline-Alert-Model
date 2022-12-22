@@ -7,8 +7,8 @@ import omp
 import time
 
 
-def alert(wavemeters, lm, hs, dir, slp, wspd10, depth):
-    cumulativeEffectClass = omp.alert(wavemeters.to_numpy(), lm, hs, dir, slp, wspd10, depth)
+def alert(wavemeters, lons, lats, lm, hs, dir, t0m1, depth):
+    cumulativeEffectClass = omp.alert(wavemeters.to_numpy(), lons, lats, lm, hs, dir, t0m1, depth)
 
     return cumulativeEffectClass
 
@@ -20,8 +20,10 @@ rank = comm.Get_rank()
 if rank == 0:
     start_time = time.time()
 
-    df = gpd.read_file("data/virtualWavemeters.json").iloc[:1]
+    #df = gpd.read_file("data/wavemeter.geojson").iloc[:1]
+    df = gpd.read_file("data/wavemeter.geojson")
     totalSize = len(df)
+    print(totalSize)
     wavemeters = [None] * size
 
     spare = totalSize % size
@@ -32,36 +34,38 @@ if rank == 0:
         else:
             wavemeters[i] = df.iloc[data_part[i]:data_part[i+1]]
 
-    ww3 = Dataset("ww33/regridded/ww33_d03_20221201Z0300.nc.nc")
+    ww3 = Dataset("data/regridded_ww33_d03_20221224Z2000.nc")
     lm = ww3["lm"][0][:]
     hs = ww3["hs"][0][:]
     dir = ww3["dir"][0][:]
+    t0m1 = ww3["t0m1"][0][:]
 
-    wrf5 = Dataset("wrf5/regridded/wrf5_d03_20221201Z0300.nc.nc")
-    slp = wrf5['SLP'][0][:]
-    wspd10 = wrf5['WSPD10'][0][:]
-
-    dtm = Dataset("data/sam_d03_terrain.nc")
+    dtm = Dataset("data/DTM.nc")
     depth = dtm["height"][:]
+    lons = dtm["longitude"][:]
+    lats = dtm["latitude"][:]
 else:
+    totalSize = None
     wavemeters = None
     lm = None
     hs = None
     dir = None
-    slp = None
-    wspd10 = None
-    totalSize = None
+    t0m1 = None
     depth = None
+    lons = None
+    lats = None
 
 wavemeters = comm.scatter(wavemeters, root = 0)
 lm = comm.bcast(lm, root=0)
 hs = comm.bcast(hs, root=0)
 dir = comm.bcast(dir, root=0)
-slp = comm.bcast(slp, root=0)
-wspd10 = comm.bcast(wspd10, root=0)
+t0m1 = comm.bcast(t0m1, root=0)
+depth = comm.bcast(depth, root=0)
+lons = comm.bcast(lons, root=0)
+lats = comm.bcast(lats, root=0)
 totalSize = comm.bcast(totalSize, root=0)
 
-classVarPartition = alert(wavemeters, lm, hs, dir, slp, wspd10, depth)
+classVarPartition = alert(wavemeters, lons, lats, lm, hs, dir, t0m1, depth)
 
 classVar = None
 if rank == 0:

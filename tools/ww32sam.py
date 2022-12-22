@@ -27,11 +27,13 @@ latsww3 = latsww3[latliww3:latuiww3]
 lm = ww3file["lm"][:, latliww3:latuiww3, lonliww3:lonuiww3]
 hs = ww3file["hs"][:, latliww3:latuiww3, lonliww3:lonuiww3]
 dir = ww3file["dir"][:, latliww3:latuiww3, lonliww3:lonuiww3]
+t0m1 = ww3file["t0m1"][:, latliww3:latuiww3, lonliww3:lonuiww3]
 
 X_ww3, Y_ww3 = np.meshgrid(lonsww3, latsww3)
 hs = utils.interp(X_ww3, Y_ww3, hs, grid_lon, grid_lat, fill_value)
 lm = utils.interp(X_ww3, Y_ww3, lm, grid_lon, grid_lat, fill_value)
 dir = utils.interp(X_ww3, Y_ww3, dir, grid_lon, grid_lat, fill_value)
+t0m1 = utils.interp(X_ww3, Y_ww3, t0m1, grid_lon, grid_lat, fill_value)
 time = ww3file["time"][:]
 
-utils.saveNetCDF(sys.argv[3] + "/" + sys.argv[2].split("/")[-1], grid_lat, grid_lon, time, hs, lm, dir, None, None, fill_value)
+utils.saveNetCDF(sys.argv[3] + "/" + sys.argv[2].split("/")[-1], grid_lat, grid_lon, time, hs, lm, dir, t0m1, None, None, fill_value)
