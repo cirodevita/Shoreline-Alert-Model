@@ -17,7 +17,6 @@ mpi4py==3.1.4
 mpmath==1.2.1
 munch==2.5.0
 netCDF4==1.6.2
-numba==0+untagged.g37343ce35
 numpy==1.23.5
 packaging==21.3
 pandas==1.5.2
