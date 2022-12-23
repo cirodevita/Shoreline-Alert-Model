@@ -194,7 +194,9 @@ def runUp(data):
 
 def calculateIdx(wavemeter, lons, lats, lm, hs, dir, t0m1, depth):
     transect = json.loads(wavemeter[3])
-    m = list(filter(lambda t: t['d'] == 0, transect))[0]["m"]
+    #m = list(filter(lambda t: t['d'] == 0, transect))[0]["m"]
+    idx = next((index for (index, d) in enumerate(transect) if d["d"] == 0), None)
+    m = transect[idx]["m"]
     
     earthPoint = wavemeter[-1].coords[0]
     ondameterPoint = wavemeter[-1].coords[1]
@@ -217,7 +219,6 @@ def calculateIdx(wavemeter, lons, lats, lm, hs, dir, t0m1, depth):
     dataItem = {
         "hs": hs,
         "tmn": tmn,
-        "depth": abs(depth),
         "gammaOV": GammaOV,
         "cOV": cOV,
         "transect": transect,
@@ -228,11 +229,13 @@ def calculateIdx(wavemeter, lons, lats, lm, hs, dir, t0m1, depth):
         iDepth = -1.2 * hs
 
         try:
-            br = transfBreak(dataItem)
-            dataItem["hs"] = br["hsBreak"]
-            iDepth = -br["hBreak"]
-            
-            ru = runUp(dataItem)
+            for p in transect[idx+1:][::-1]:
+                dataItem["depth"] = abs(p["h"])
+                br = transfBreak(dataItem)
+                dataItem["hs"] = br["hsBreak"]
+                iDepth = -br["hBreak"]
+
+                ru = runUp(dataItem)
 
             return 1
         except Exception as e:
